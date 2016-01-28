@@ -21,6 +21,7 @@
 #include <linux/leds.h>
 #include <linux/qpnp/pwm.h>
 #include <linux/err.h>
+#include <linux/display_state.h>
 
 #include "mdss_dsi.h"
 #ifdef CONFIG_MFD_TPS65132
@@ -66,6 +67,13 @@ DEFINE_LED_TRIGGER(bl_led_trigger);
 #include <linux/backlight.h>
 static struct backlight_device *bl_dev;
 #endif
+
+bool display_on = true;
+
+bool is_display_on()
+{
+	return display_on;
+}
 
 void mdss_dsi_panel_pwm_cfg(struct mdss_dsi_ctrl_pdata *ctrl)
 {
@@ -596,6 +604,8 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+	display_on = true;
+
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 	mipi  = &pdata->panel_info.mipi;
@@ -636,6 +646,9 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
 	pr_debug("%s:-\n", __func__);
+
+	display_on = false;
+
 	return 0;
 }
 #ifdef CONFIG_MACH_LGE
@@ -662,6 +675,10 @@ int mdss_dsi_panel_ief_off(void)
 		mdss_mdp_clk_ctrl(MDP_BLOCK_POWER_OFF, false);
 	}
 
+	pr_info("%s:\n", __func__);
+
+	display_on = false;
+
 	return 0;
 }
 EXPORT_SYMBOL(mdss_dsi_panel_ief_off);
@@ -680,6 +697,8 @@ int mdss_dsi_panel_ief_on(void)
 		pr_err("%s: Panel is off\n", __func__);
 		return -EPERM;
 	}
+
+	display_on = true;
 
 	ctrl = container_of(pdata_base, struct mdss_dsi_ctrl_pdata,	panel_data);
 	pdata = &(ctrl->panel_data);
