@@ -1635,11 +1635,25 @@ void hdd_sendActionCnf( hdd_adapter_t *pAdapter, tANI_BOOLEAN actionSendSuccess 
 
     cfgState->actionFrmState = HDD_IDLE;
 
-    hddLog( LOG1, "Send Action cnf, actionSendSuccess %d", actionSendSuccess);
     if( NULL == cfgState->buf )
     {
         return;
     }
+    if (cfgState->is_go_neg_ack_received)
+    {
+        cfgState->is_go_neg_ack_received = 0;
+        /* Sometimes its possible that host may receive the ack for GO
+         * negotiation req after sending go negotaition confirmation,
+         * in such case drop the ack received for the go negotiation
+         * request, so that supplicant waits for the confirmation ack
+         * from firmware.
+         */
+        hddLog( LOG1, FL("Drop the pending ack received in cfgState->actionFrmState %d"),
+                cfgState->actionFrmState);
+        return;
+    }
+
+    hddLog( LOG1, "Send Action cnf, actionSendSuccess %d", actionSendSuccess);
 
     /* If skb is NULL it means this packet was received on CFG80211 interface
      * else it was received on Monitor interface */
@@ -2465,6 +2479,8 @@ void hdd_indicateMgmtFrame( hdd_adapter_t *pAdapter,
              {
                   hddLog(LOG1, "%s: ACK_PENDING and But received RESP for Action frame ",
                          __func__);
+                 cfgState->is_go_neg_ack_received = 1;
+
                   hdd_sendActionCnf(pAdapter, TRUE);
                 }
             }
