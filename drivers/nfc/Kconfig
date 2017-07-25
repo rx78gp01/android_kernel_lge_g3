@@ -98,6 +98,19 @@ config NFC_WILINK
 
 	  Say Y here to compile support for Texas Instrument's NFC WiLink driver
 	  into the kernel or say M to compile it as module.
+	  
+config LGE_NFC_SONY
+    bool "CXD2235BGG NFC driver for kddi"
+    #depends on I2C && UART
+    default n
+    ---help---
+      Say yes if you want CDX2235AGG Near Field Communication driver.
+      This is for i2c & UART connected version. If unsure, say N here.
+
+      To compile this driver as a module, choose m here. The module will
+      be called CDX2235AGG.
+      
+source "drivers/nfc/snfc/Kconfig"
 
 endmenu
 

@@ -530,10 +530,12 @@ static void msm_hsl_start_tx(struct uart_port *port)
 		pr_err("%s: System is in Suspend state\n", __func__);
 		return;
 	}
+
 #ifdef CONFIG_MACH_LGE
 	if (!(lge_get_uart_mode() & UART_MODE_EN_BMSK) && is_console(port))
 		return;
 #endif
+
 	msm_hsl_port->imr |= UARTDM_ISR_TXLEV_BMSK;
 	msm_hsl_write(port, msm_hsl_port->imr,
 		regmap[msm_hsl_port->ver_id][UARTDM_IMR]);
@@ -760,6 +762,7 @@ static unsigned int msm_hsl_tx_empty(struct uart_port *port)
 	if (!(lge_get_uart_mode() & UART_MODE_EN_BMSK) && is_console(port))
 		return 1;
 #endif
+
 	ret = (msm_hsl_read(port, regmap[vid][UARTDM_SR]) &
 	       UARTDM_SR_TXEMT_BMSK) ? TIOCSER_TEMT : 0;
 	return ret;
@@ -988,7 +991,6 @@ static void msm_hsl_deinit_clock(struct uart_port *port)
 	clk_en(port, 0);
 }
 #endif
-
 static int msm_hsl_startup(struct uart_port *port)
 {
 	struct msm_hsl_port *msm_hsl_port = UART_TO_MSM(port);
@@ -1103,6 +1105,16 @@ static void msm_hsl_set_termios(struct uart_port *port,
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 200, 4000000);
 
+	/* 20111205, chaeuk.lee@lge.com, Add IrDA UART [START]
+	 * Set UART for IrDA
+	 * 0x03 : UART_IRDA | RX_INVERT
+	 * [CAUTION] UARTDM register must be set AFTER UARTDM clock has been set
+	*/
+	#ifdef CONFIG_LGE_IRDA_KDDI
+	if(port->line == 3){
+		msm_hsl_write(port, 0x03, UARTDM_IRDA_ADDR);
+	}
+	#endif
 	/*
 	 * Due to non-availability of 3.2 Mbps baud rate as standard baud rate
 	 * with TTY/serial core. Map 200 BAUD to 3.2 Mbps
@@ -1360,6 +1372,17 @@ static struct msm_hsl_port msm_hsl_uart_ports[] = {
 			.line = 2,
 		},
 	},
+#ifdef CONFIG_LGE_IRDA_KDDI
+	{
+		.uart = {
+			.iotype = UPIO_MEM,
+			.ops = &msm_hsl_uart_pops,
+			.flags = UPF_BOOT_AUTOCONF,
+			.fifosize = 64,
+			.line = 3,
+		},
+	},
+#endif
 };
 
 #define UART_NR	ARRAY_SIZE(msm_hsl_uart_ports)
@@ -1463,6 +1486,7 @@ static void msm_hsl_console_write(struct console *co, const char *s,
 	if (!(lge_get_uart_mode() & UART_MODE_EN_BMSK))
 		return;
 #endif
+
 	port = get_port_from_line(co->index);
 	msm_hsl_port = UART_TO_MSM(port);
 	vid = msm_hsl_port->ver_id;
@@ -1958,7 +1982,6 @@ static int msm_serial_hsl_suspend(struct device *dev)
 	port = get_port_from_line(get_line(pdev));
 
 	if (port) {
-
 #ifdef CONFIG_MACH_LGE
 		uart_suspend_port(&msm_hsl_uart_driver, port);
 #else
@@ -1981,7 +2004,6 @@ static int msm_serial_hsl_resume(struct device *dev)
 	port = get_port_from_line(get_line(pdev));
 
 	if (port) {
-
 #ifdef CONFIG_MACH_LGE
 		uart_resume_port(&msm_hsl_uart_driver, port);
 #else

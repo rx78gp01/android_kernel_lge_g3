@@ -1319,6 +1319,41 @@ int32_t msm_sensor_platform_probe(struct platform_device *pdev, void *data)
 		kfree(cci_client);
 		return rc;
 	}
+	
+#if defined(CONFIG_MACH_MSM8974_G3_KDDI)
+	if(!strcmp(s_ctrl->sensordata->sensor_name, "imx135")) {
+
+		uint16_t chip_type;
+
+		rc = s_ctrl->sensor_i2c_client->i2c_func_tbl->i2c_write(
+			s_ctrl->sensor_i2c_client,
+			0x3B02,
+			0x00, MSM_CAMERA_I2C_BYTE_DATA);
+		pr_info("%s: write 0x00 to 0x3B02, rc %d\n", __func__, rc);
+
+		rc = s_ctrl->sensor_i2c_client->i2c_func_tbl->i2c_write(
+			s_ctrl->sensor_i2c_client,
+			0x3B00,
+			0x01, MSM_CAMERA_I2C_BYTE_DATA);
+		pr_info("%s: write 0x01 to 0x3B00, rc %d\n", __func__, rc);
+
+
+		rc = s_ctrl->sensor_i2c_client->i2c_func_tbl->i2c_read(
+			s_ctrl->sensor_i2c_client,
+			0x3B01,
+			&chip_type, MSM_CAMERA_I2C_BYTE_DATA);
+		pr_info("%s: check status 0x3B01, value = %d rc %d\n", __func__, chip_type, rc);
+
+		rc = s_ctrl->sensor_i2c_client->i2c_func_tbl->i2c_read(
+			s_ctrl->sensor_i2c_client,
+			0x3B2C,
+			&chip_type, MSM_CAMERA_I2C_BYTE_DATA);
+		if(rc < 0)
+			pr_err("%s: read chip_type failed, rc %d\n", __func__, rc);
+		else
+			pr_info("%s: chip_type = %d\n", __func__, chip_type & 0x01);
+	}
+#endif
 
 	CDBG("%s %s probe succeeded\n", __func__,
 		s_ctrl->sensordata->sensor_name);

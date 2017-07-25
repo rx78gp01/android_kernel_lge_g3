@@ -127,6 +127,13 @@ config IMX208
 	depends on MSMB_CAMERA
 	---help---
 	  SONY 2.1M BAYER MIPI Sensor without Autofocus
+	  
+config IMX119
+        bool "Sensor IMX119 1.3MP MIPI (Bayer 1.3M)"
+	depends on MSMB_CAMERA
+	---help---
+		SONY 1.3M BAYER MIPI Sensor without Autofocus, uses
+		1 mipi lane.
 
 config IMX134
 	bool "Sensor IMX134 (BAYER 8M)"

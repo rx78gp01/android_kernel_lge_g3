@@ -74,4 +74,6 @@ obj-$(CONFIG_LGE_IRRC) += lge_uei_irrc.o
 obj-$(CONFIG_EARJACK_DEBUGGER) += lge_earjack_debugger.o
 obj-$(CONFIG_BU52031NVX) += pm8xxx-cradle.o
 obj-$(CONFIG_TSPDRV) += tspdrv/
+obj-$(CONFIG_ANDROID_SW_IRRC)	+= android_irrc.o
+obj-$(CONFIG_LGE_IRDA_KDDI)	+= lge_irtty-kddi.o
 obj-$(CONFIG_UID_CPUTIME) 	+= uid_cputime.o

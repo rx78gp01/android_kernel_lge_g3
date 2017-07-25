@@ -70,7 +70,7 @@ static struct gpiomux_setting ap2mdm_wakeup = {
 	.dir = GPIOMUX_OUT_LOW,
 };
 
-#ifdef CONFIG_SHITTY_VARIANT
+#if defined(CONFIG_SHITTY_VARIANT) && !defined(CONFIG_MACH_MSM8974_G3_KDDI)
 static struct msm_gpiomux_config mdm_configs[] = {
 #else
 static struct msm_gpiomux_config mdm_configs[] __initdata = {

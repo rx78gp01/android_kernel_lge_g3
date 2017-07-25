@@ -558,6 +558,13 @@ config TSPP
 	Transport Stream Packet Processor is used to offload the
 	processing of MPEG transport streams from the main processor.
 	This can also be compiled as a loadable module.
+	
+config ANDROID_SW_IRRC
+	bool "Android irrc support"
+	default n
+	---help---
+	This option enables device driver support for Android SW IRRC
+	Some functions should be given by platform data for enable PWM, Motor IC, etc.
 
 config CI_BRIDGE_SPI
 	depends on SPI_QUP
@@ -686,6 +693,10 @@ config BU52031NVX
 	help
 	  This option enable device driver support for the cradle
 	  on the PM8XXX chips. The cradle is controlled using the PM8XXX gpio
+	  
+config LGE_IRDA_KDDI
+		bool "LGE IrDA driver for KDDI"
+		default n
 
 config UID_CPUTIME
 	tristate "Per-UID cpu time statistics"

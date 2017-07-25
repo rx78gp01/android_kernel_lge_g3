@@ -583,7 +583,7 @@ int lge_get_factory_cable(void)
 static hw_rev_type lge_bd_rev = HW_REV_1_0; /* HW_REV_B; */
 
 /* CAUTION: These strings are come from LK. */
-#ifdef CONFIG_MACH_MSM8974_G3_GLOBAL_COM
+#if defined (CONFIG_MACH_MSM8974_G3_GLOBAL_COM) || defined (CONFIG_MACH_MSM8974_G3_KDDI)
 char *rev_str[] = {"evb1", "evb2", "rev_a", "rev_a1", "rev_b", "rev_c", "rev_d",
 	"rev_e", "rev_g", "rev_h", "rev_10", "rev_11", "rev_12",
 	"reserved"};

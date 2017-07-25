@@ -534,6 +534,23 @@ config LGE_CHARGER_TEMP_SCENARIO
 	bool "LGE CHARGING TEMP SCENARIO Configuration"
 	help
 	  LGE CHARGER TEMP SCENARIO Configuration
+	  
+config LGE_QC_2_0_SCENARIO
+	tristate "LGE CHARGING SCENARIO of QC 2.0"
+	depends on QPNP_CHARGER
+	depends on LGE_PM
+	default n
+	help
+	  LGE CHARGING SCENARIO of QC 2.0
+	  
+config LGE_QC_2_0_SCENARIO_WITH_VOLTAGE
+	tristate "lge usb input voltage scenario of QC 2.0"
+	depends on QPNP_CHARGER
+	depends on LGE_PM
+	depends on LGE_QC_2_0_SCENARIO
+	default n
+	help
+	  lge usb input voltage scenario of QC 2.0 
 
 config MAX17048_FUELGAUGE
 	tristate "Maxim MAX17048 fuel gauging external driver"
@@ -549,6 +566,12 @@ config LGE_CURRENTNOW
 	default n
 	help
 	  Say Y here to enable LGE current now reader
+	  
+config LGE_ONLY_READ_CURRENT
+	bool "Only use feature that read current of battery at BMS"
+	default n
+	help
+	  Say Y here to enable BMS current now reader
 
 config BQ24296_CHARGER
 	tristate "bq24296 charger"

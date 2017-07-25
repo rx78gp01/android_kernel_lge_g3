@@ -2902,6 +2902,9 @@ static struct clk_freq_tbl ftbl_camss_gp0_1_clk[] = {
 	F_MM(29090,       cxo,  6,   1,  110), /* for 230Hz*/
 	F_MM(22222,       cxo,  16,   1,  54), /* for 175Hz */
 #endif
+#if defined(CONFIG_ANDROID_SW_IRRC)
+    F_MM(96000,       cxo,  4,    1,  50),
+#endif
 	F_MM( 6000000,  gpll0,  10,   1,  10),
 	F_MM(12000000,  gpll0,  10,   1,   5),
 	F_MM(13000000,  gpll0,  10,  13,  60),
@@ -4974,10 +4977,13 @@ static struct clk_lookup msm_clocks_8974_common[] __initdata = {
 	CLK_LOOKUP("iface_clk", gcc_blsp1_ahb_clk.c, "f9921000.uart"),     // UART5
 	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f9960000.uart"),  //G2
 #endif
+#if (defined(CONFIG_MACH_MSM8974_G3) || defined(CONFIG_MACH_MSM8974_DZNY)) && defined(CONFIG_LGE_NFC_SONY)
+	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f9960000.serial"),
+#endif
 	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f9967000.i2c"),
 	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f9966000.spi"),
 	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f995e000.serial"),
-#ifdef CONFIG_LGE_IRRC
+#if defined(CONFIG_LGE_IRRC) || defined(CONFIG_LGE_IRDA_KDDI)
 	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f9962000.serial"),
 #else
 	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f995d000.uart"),
@@ -5010,7 +5016,7 @@ static struct clk_lookup msm_clocks_8974_common[] __initdata = {
 #endif
 	CLK_LOOKUP("core_clk", gcc_blsp2_uart4_apps_clk.c, ""),
 	CLK_LOOKUP("core_clk", gcc_blsp2_uart5_apps_clk.c, ""),
-#ifdef CONFIG_LGE_IRRC
+#if defined(CONFIG_LGE_IRRC) || defined(CONFIG_LGE_IRDA_KDDI)
 	CLK_LOOKUP("core_clk", gcc_blsp2_uart6_apps_clk.c, "f9962000.serial"),
 #else
 	CLK_LOOKUP("core_clk", gcc_blsp2_uart6_apps_clk.c, ""),
@@ -5165,8 +5171,19 @@ static struct clk_lookup msm_clocks_8974_common[] __initdata = {
 	CLK_LOOKUP("cam_clk", camss_mclk2_clk.c, "6e.qcom,camera"),
 	CLK_LOOKUP("cam_src_clk", mclk2_clk_src.c, "6c.qcom,camera"),
 	CLK_LOOKUP("cam_clk", camss_mclk2_clk.c, "6c.qcom,camera"),
+#ifdef CONFIG_IMX091
+	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "34.qcom,camera_kddi"),
+	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "34.qcom,camera_kddi"),
+#endif
+#ifdef CONFIG_IMX119
+	CLK_LOOKUP("cam_src_clk", mclk2_clk_src.c, "6e.qcom,camera_kddi"),
+	CLK_LOOKUP("cam_clk", camss_mclk2_clk.c, "6e.qcom,camera_kddi"),
+#endif
 #ifdef CONFIG_TSPDRV
 	CLK_LOOKUP("cam_gp1_clk", camss_gp1_clk.c, "vibrator"),
+#endif
+#if defined(CONFIG_ANDROID_SW_IRRC)
+	CLK_LOOKUP("cam_gp1_clk", camss_gp1_clk.c, "sw_irrc"),
 #endif
 #else
 	/* MM sensor clocks placeholder */

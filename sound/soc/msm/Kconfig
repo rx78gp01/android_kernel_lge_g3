@@ -259,4 +259,11 @@ config SND_SOC_MDM9625
 	select SND_DYNAMIC_MINORS
 	help
 	 To add support for SoC audio on MDM9625 boards.
+	 
+config HIFI_SOUND
+	bool "HIFI 24bit SOUND"
+	default y
+	help
+	 HIFI 24bit sound
+	 
 endmenu

@@ -94,7 +94,7 @@ static void setup_broadcast_timer(void *arg);
 static int lpm_cpu_callback(struct notifier_block *cpu_nb,
 				unsigned long action, void *hcpu);
 
-#ifdef CONFIG_SHITTY_VARIANT
+#if defined(CONFIG_SHITTY_VARIANT) && !defined(CONFIG_MACH_MSM8974_G3_KDDI)
 static struct notifier_block lpm_cpu_nblk = {
 #else
 static struct notifier_block __refdata lpm_cpu_nblk = {
@@ -103,7 +103,11 @@ static struct notifier_block __refdata lpm_cpu_nblk = {
 };
 
 static uint32_t allowed_l2_mode;
+#if defined(CONFIG_SHITTY_VARIANT) && !defined(CONFIG_MACH_MSM8974_G3_KDDI)
+static uint32_t sysfs_dbg_l2_mode = MSM_SPM_L2_MODE_POWER_COLLAPSE;
+#else
 static uint32_t sysfs_dbg_l2_mode __refdata = MSM_SPM_L2_MODE_POWER_COLLAPSE;
+#endif
 static uint32_t default_l2_mode;
 
 

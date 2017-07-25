@@ -620,6 +620,20 @@ int clk_set_flags(struct clk *clk, unsigned long flags)
 }
 EXPORT_SYMBOL(clk_set_flags);
 
+#ifdef CONFIG_ANDROID_SW_IRRC
+unsigned int get_clk_count(struct clk *clk)
+{
+    unsigned int count;
+    unsigned long flags;
+
+    spin_lock_irqsave(&clk->lock, flags);
+    count = clk->count;
+    spin_unlock_irqrestore(&clk->lock, flags);
+    return count;
+}
+EXPORT_SYMBOL(get_clk_count);
+#endif  // CONFIG_ANDROID_SW_IRRC
+
 static LIST_HEAD(initdata_list);
 
 static void init_sibling_lists(struct clk_lookup *clock_tbl, size_t num_clocks)

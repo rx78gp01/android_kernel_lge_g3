@@ -249,6 +249,17 @@ int clk_set_rate(struct clk *clk, unsigned long rate);
  */
 int clk_set_parent(struct clk *clk, struct clk *parent);
 
+#ifdef CONFIG_ANDROID_SW_IRRC
+/**
+ * get_clk_count - get count of clock source for this clock
+ * @clk: clock source
+ *
+ * Returns success clk's count.
+ */
+
+unsigned int get_clk_count(struct clk *clk);
+#endif  // CONFIG_ANDROID_SW_IRRC
+
 /**
  * clk_get_parent - get the parent clock source for this clock
  * @clk: clock source
