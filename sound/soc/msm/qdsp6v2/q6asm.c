@@ -2769,6 +2769,9 @@ static int __q6asm_media_format_block_pcm(struct audio_client *ac,
 	fmt.bits_per_sample = bits_per_sample;
 	fmt.sample_rate = rate;
 	fmt.is_signed = 1;
+#ifdef CONFIG_HIFI_SOUND
+	fmt.reserved = 0;
+#endif
 
 	channel_mapping = fmt.channel_mapping;
 

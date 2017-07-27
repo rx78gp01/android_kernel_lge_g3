@@ -266,4 +266,10 @@ config HIFI_SOUND
 	help
 	 HIFI 24bit sound
 	 
+config SND_LGE_DSDP_DUAL_AUDIO
+    bool "LGE DSDP DUAL AUDIO"
+    default n
+    help
+     LGE Sound DSPD Dual Audio
+	 
 endmenu

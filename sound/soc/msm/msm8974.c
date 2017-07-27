@@ -3275,6 +3275,23 @@ static struct snd_soc_dai_link msm8974_lge_dai_link[] = {
 		.ignore_pmdown_time = 1,
 		.be_id = MSM_FRONTEND_DAI_MULTIMEDIA1
 	},
+#ifdef CONFIG_SND_LGE_DSDP_DUAL_AUDIO
+	{
+		.name = "Dual Audio",
+		.stream_name = "MultiMedia3",
+		.cpu_dai_name   = "MultiMedia3",
+		.platform_name  = "msm-pcm-dsp.0",
+		.dynamic = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			SND_SOC_DPCM_TRIGGER_POST},
+		.ignore_suspend = 1,
+		/* this dainlink has playback support */
+		.ignore_pmdown_time = 1,
+		.be_id = MSM_FRONTEND_DAI_MULTIMEDIA3,
+	},
+#else
 	/* DUMMY DAI Link */
 	{
 		.name = "Dummy DAI 106",
@@ -3291,6 +3308,7 @@ static struct snd_soc_dai_link msm8974_lge_dai_link[] = {
 		.ignore_pmdown_time = 1,
 		.be_id = MSM_FRONTEND_DAI_MULTIMEDIA1
 	},
+#endif /*CONFIG_SND_LGE_DSDP_DUAL_AUDIO*/
 };
 
 static struct snd_soc_dai_link msm8974_dummy_dai_link[] = {
