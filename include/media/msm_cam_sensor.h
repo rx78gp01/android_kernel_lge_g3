@@ -363,12 +363,12 @@ struct msm_sensor_info_t {
 	uint32_t sensor_mount_angle;
 	int modes_supported;
 	enum camb_position_t position;
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 	int ois_supported;
 #endif
 };
 
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 struct msm_sensor_ois_info_t{
 	char ois_provider[MAX_SENSOR_NAME];
 	int16_t gyro[2];
@@ -392,7 +392,7 @@ enum ois_ver_t {
 };
 #endif
 
-#ifdef CONFIG_LG_PROXY
+#ifdef CONFIG_MACH_LGE
 struct msm_sensor_proxy_info_t{
 	uint16_t proxy_val;
 	uint32_t proxy_conv;
@@ -426,7 +426,7 @@ struct msm_sensor_init_params {
 	enum camb_position_t position;
 	/* sensor mount angle */
 	uint32_t            sensor_mount_angle;
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 	int ois_supported;
 #endif
 };
@@ -449,7 +449,7 @@ struct sensorb_cfg_data {
 	union {
 		struct msm_sensor_info_t      sensor_info;
 		struct msm_sensor_init_params sensor_init_params;
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 		struct msm_sensor_ois_info_t	ois_info;
 		struct msm_sensor_proxy_info_t	proxy_info;
 		uint16_t proxy_data;
@@ -540,14 +540,12 @@ enum msm_sensor_cfg_type_t {
 	CFG_SET_WHITE_BALANCE,
 	CFG_SET_AUTOFOCUS,
 	CFG_CANCEL_AUTOFOCUS,
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 	CFG_OIS_ON,
 	CFG_OIS_OFF,
 	CFG_GET_OIS_INFO,
 	CFG_SET_OIS_MODE,
 	CFG_OIS_MOVE_LENS,
-#endif
-#ifdef CONFIG_LG_PROXY
 	CFG_PROXY_ON,
 	CFG_PROXY_OFF,
 	CFG_GET_PROXY,
@@ -711,7 +709,7 @@ enum msm_camera_led_config_t {
 	MSM_CAMERA_LED_HIGH,
 	MSM_CAMERA_LED_INIT,
 	MSM_CAMERA_LED_RELEASE,
-#ifdef CONFIG_LGE_DUAL_LED
+#ifdef CONFIG_MACH_LGE
 	MSM_CAMERA_LED_HIGH_20P,
 	MSM_CAMERA_LED_HIGH_40P,
 	MSM_CAMERA_LED_HIGH_60P,

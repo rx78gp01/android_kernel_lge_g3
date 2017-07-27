@@ -191,7 +191,7 @@ static int32_t msm_sensor_get_dt_data(struct device_node *of_node,
 		rc = 0;
 	}
 
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 	if (of_property_read_bool(of_node, "qcom,gpio-ois-ldo") == true) {
 		sensordata->sensor_info->ois_supported = true;
 	}
@@ -458,6 +458,11 @@ int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 	struct msm_camera_i2c_client *sensor_i2c_client;
 	struct msm_camera_slave_info *slave_info;
 	const char *sensor_name;
+	
+#if defined(CONFIG_MACH_LGE)
+/* Add sensor On/Off log */
+	pr_info("%s E, sensor name = %s\n", __func__, s_ctrl->sensordata->sensor_name);
+#endif
 
 	if (!s_ctrl) {
 		pr_err("%s:%d failed: %p\n",
@@ -487,6 +492,10 @@ int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 		msm_camera_power_down(power_info, s_ctrl->sensor_device_type,
 					sensor_i2c_client);
 
+#if defined(CONFIG_MACH_LGE)
+/* Add sensor On/Off log */
+	pr_info("%s X, sensor name = %s\n", __func__, s_ctrl->sensordata->sensor_name);
+#endif
 	return rc;
 }
 
@@ -619,7 +628,7 @@ int msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp)
 		CDBG("%s:%d mount angle valid %d value %d\n", __func__,
 			__LINE__, cdata->cfg.sensor_info.is_mount_angle_valid,
 			cdata->cfg.sensor_info.sensor_mount_angle);
-#ifdef CONFIG_LG_OIS
+#ifdef CONFIG_MACH_LGE
 			cdata->cfg.sensor_info.ois_supported =
 				s_ctrl->sensordata->sensor_info->ois_supported;
 #endif

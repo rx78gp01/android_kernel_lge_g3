@@ -619,6 +619,8 @@ static int32_t msm_actuator_init(struct msm_actuator_ctrl_t *a_ctrl,
 	uint16_t i = 0;
 	struct msm_camera_cci_client *cci_client = NULL;
 	CDBG("Enter\n");
+	
+	current_moment = CAMERA_ENTER_MOMENT;
 
 	for (i = 0; i < ARRAY_SIZE(actuators); i++) {
 		if (set_info->actuator_params.act_type ==
@@ -895,7 +897,11 @@ static unsigned int msm_actuator_StablePosition_delay_calc(int16_t cur_dac, int1
 static int16_t msm_actuator_StablePosition_pos_calc(int16_t cur_pos)
 {
 	//You can use the actuator postion tuning
+#if defined(CONFIG_LG_OIS)
 	return 0;
+#else
+	return cur_pos * 1 /2;
+#endif
 }
 
 static int32_t msm_actuator_StablePosition(struct msm_actuator_ctrl_t *a_ctrl)
