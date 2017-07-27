@@ -4928,6 +4928,12 @@ static struct clk_lookup msm_clocks_8974_common[] __initdata = {
 	CLK_LOOKUP("xo",         cxo_d1_pin.c,              "nfc_ext19"),
 #endif
 #endif
+#if defined(CONFIG_LGE_BROADCAST_TDMB)
+	CLK_LOOKUP("xo",             cxo_a2.c,                 "spi100.0"),
+#endif
+#if defined(CONFIG_LGE_BROADCAST_ISDBT_JAPAN)
+    CLK_LOOKUP("isdbt_xo",       cxo_a2.c,				   "8-0058"),
+#endif
 	CLK_LOOKUP("ref_clk",  cxo_d1_a_pin.c,                   "3-000e"),
 	CLK_LOOKUP("ref_clk_rf", cxo_a2_a_pin.c,                 "3-000e"),
 	CLK_LOOKUP("measure",	measure_clk.c,	"debug"),
@@ -4990,6 +4996,20 @@ static struct clk_lookup msm_clocks_8974_common[] __initdata = {
 #endif
 	CLK_LOOKUP("core_clk", gcc_blsp2_qup1_i2c_apps_clk.c, ""),
 	CLK_LOOKUP("core_clk", gcc_blsp2_qup1_spi_apps_clk.c, ""),
+/* LGE_BROADCAST_ISDBT_JAPAN { */
+#if defined (CONFIG_LGE_BROADCAST_ISDBT_JAPAN) || defined(CONFIG_MACH_MSM8974_T1_ATT) || defined(CONFIG_MACH_MSM8974_T1LTE_GLOBAL_COM)
+	CLK_LOOKUP("iface_clk", gcc_blsp2_ahb_clk.c, "f9964000.i2c"),
+	CLK_LOOKUP("core_clk", gcc_blsp2_qup2_i2c_apps_clk.c, "f9964000.i2c"),	/* BLSP8, BLSP 2 QUP 1, 0xF9964000 */
+#else
+	CLK_LOOKUP("core_clk", gcc_blsp2_qup2_i2c_apps_clk.c, ""),
+#endif
+/* LGE_BROADCAST_ISDBT_JAPAN } */
+
+#if defined(CONFIG_LGE_BROADCAST_TDMB)
+	CLK_LOOKUP("core_clk", gcc_blsp2_qup2_spi_apps_clk.c, "f9964000.spi"),
+#else
+	CLK_LOOKUP("core_clk", gcc_blsp2_qup2_spi_apps_clk.c, ""),
+#endif /* LGE_BROADCAST */
 	CLK_LOOKUP("core_clk", gcc_blsp2_qup2_i2c_apps_clk.c, ""),
 	CLK_LOOKUP("core_clk", gcc_blsp2_qup2_spi_apps_clk.c, ""),
 	CLK_LOOKUP("core_clk", gcc_blsp2_qup3_i2c_apps_clk.c, ""),
