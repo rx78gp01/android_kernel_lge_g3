@@ -49,6 +49,11 @@ config LGE_KSWITCH
 	depends on MACH_LGE
 	help
 	  LGE Kill Switch
+	  
+config LCD_KCAL
+	depends on MACH_LGE
+	bool "Enable sysfs for LCD KCAL"
+	default n
 
 config LGE_QFPROM_INTERFACE
 	bool "Support qfprom interface"

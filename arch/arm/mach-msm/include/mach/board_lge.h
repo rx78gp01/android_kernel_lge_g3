@@ -5,14 +5,14 @@ typedef enum {
 	HW_REV_EVB1 = 0,
 	HW_REV_EVB2,
 	HW_REV_A,
-#ifdef CONFIG_MACH_MSM8974_G3_GLOBAL_COM
+#if defined (CONFIG_MACH_MSM8974_G3_GLOBAL_COM) || defined (CONFIG_MACH_MSM8974_G3_KDDI)
 	HW_REV_A1,
 #endif
 	HW_REV_B,
 	HW_REV_C,
 	HW_REV_D,
 	HW_REV_E,
-#ifndef CONFIG_MACH_MSM8974_G3_GLOBAL_COM
+#if !defined (CONFIG_MACH_MSM8974_G3_GLOBAL_COM) || !defined (CONFIG_MACH_MSM8974_G3_KDDI)
 	HW_REV_F,
 #endif
 	HW_REV_G,
@@ -107,6 +107,20 @@ enum lge_boot_mode_type lge_get_boot_mode(void);
 int lge_get_factory_boot(void);
 int lge_get_factory_cable(void);
 
+#if defined(CONFIG_LCD_KCAL)
+struct kcal_data {
+		int red;
+		int green;
+		int blue;
+};
+
+struct kcal_platform_data {
+	int (*set_values) (int r, int g, int b);
+	int (*get_values) (int *r, int *g, int *b);
+	int (*refresh_display) (void);
+};
+#endif
+
 struct pre_selfd_platform_data {
 	int (*set_values) (int r, int g, int b);
 	int (*get_values) (int *r, int *g, int *b);
@@ -177,6 +191,10 @@ void __init lge_battery_id_devices(void);
 #ifdef CONFIG_LGE_KSWITCH
 #define LGE_KSWITCH_UART_DISABLE     0x1 << 3
 int lge_get_kswitch_status(void);
+#endif
+
+#if defined(CONFIG_LCD_KCAL)
+void __init lge_add_lcd_kcal_devices(void);
 #endif
 
 #endif
