@@ -112,6 +112,24 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 		if (fctrl->torch_trigger)
 			led_trigger_event(fctrl->torch_trigger, 0);
 		break;
+		
+#if defined(CONFIG_MACH_LGE)
+	case MSM_CAMERA_LED_TORCH:
+		if (fctrl->torch_trigger) {
+			max_curr_l = fctrl->torch_max_current;
+			if (cfg->torch_current > 0 &&
+					cfg->torch_current < max_curr_l) {
+				curr_l = cfg->torch_current;
+			} else {
+				curr_l = fctrl->torch_op_current;
+				pr_err("LED current clamped to %d\n",
+					curr_l);
+			}
+			led_trigger_event(fctrl->torch_trigger,
+				curr_l);
+		}
+	break;
+#endif
 
 	default:
 		rc = -EFAULT;
