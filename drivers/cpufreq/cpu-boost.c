@@ -158,9 +158,10 @@ static int boost_mig_sync_thread(void *data)
 		if (ret)
 			continue;
 
-		if (dest_policy.cur >= src_policy.cur ) {
+		if (dest_policy.cur >= src_policy.cur) {
 			pr_debug("No sync. CPU%d@%dKHz >= CPU%d@%dKHz\n",
-				 dest_cpu, dest_policy.cur, src_cpu, src_policy.cur);
+				 dest_cpu, dest_policy.cur,
+				 src_cpu, src_policy.cur);
 			continue;
 		}
 
@@ -168,14 +169,11 @@ static int boost_mig_sync_thread(void *data)
 			continue;
 
 		cancel_delayed_work_sync(&s->boost_rem);
-		if (sync_threshold) {
-			if (src_policy.cur >= sync_threshold)
-				s->boost_min = sync_threshold;
-			else
-				s->boost_min = src_policy.cur;
-		} else {
+		if (sync_threshold)
+			s->boost_min = min(sync_threshold, src_policy.cur);
+		else
 			s->boost_min = src_policy.cur;
-		}
+
 		/* Force policy re-evaluation to trigger adjust notifier. */
 		get_online_cpus();
 		if (cpu_online(dest_cpu)) {
