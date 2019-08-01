@@ -603,17 +603,8 @@ static struct binder_buffer *binder_buffer_lookup(struct binder_proc *proc,
 			n = n->rb_left;
 		else if (kern_ptr > buffer)
 			n = n->rb_right;
-		else {
-			/*
-			 * Guard against user threads attempting to
-			 * free the buffer when in use by kernel or
-			 * after it's already been freed.
-			 */
-			if (!buffer->allow_user_free)
-				return ERR_PTR(-EPERM);
-			buffer->allow_user_free = 0;
+		else
 			return buffer;
-		}
 	}
 	return NULL;
 }
@@ -809,7 +800,6 @@ static struct binder_buffer *binder_alloc_buf(struct binder_proc *proc,
 
 	rb_erase(best_fit, &proc->free_buffers);
 	buffer->free = 0;
-	buffer->allow_user_free = 0;
 	binder_insert_allocated_buffer(proc, buffer);
 	if (buffer_size != size) {
 		struct binder_buffer *new_buffer = (void *)buffer->data + size;
@@ -1586,6 +1576,7 @@ static void binder_transaction(struct binder_proc *proc,
 		return_error = BR_FAILED_REPLY;
 		goto err_binder_alloc_buf_failed;
 	}
+	t->buffer->allow_user_free = 0;
 	t->buffer->debug_id = t->debug_id;
 	t->buffer->transaction = t;
 	t->buffer->target_node = target_node;
@@ -1990,18 +1981,17 @@ int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
 			ptr += sizeof(void *);
 
 			buffer = binder_buffer_lookup(proc, data_ptr);
-			if (IS_ERR_OR_NULL(buffer)) {
-				if (PTR_ERR(buffer) == -EPERM) {
-					binder_user_error(
-						"%d:%d BC_FREE_BUFFER u%pK matched unreturned or currently freeing buffer\n",
-						proc->pid, thread->pid,
-						data_ptr);
-				} else {
-					binder_user_error(
-						"%d:%d BC_FREE_BUFFER u%pK no match\n",
-						proc->pid, thread->pid,
-						data_ptr);
-				}
+			if (buffer == NULL) {
+				binder_user_error("binder: %d:%d "
+					"BC_FREE_BUFFER u%pK no match\n",
+					proc->pid, thread->pid, data_ptr);
+				break;
+			}
+			if (!buffer->allow_user_free) {
+				binder_user_error("binder: %d:%d "
+					"BC_FREE_BUFFER u%pK matched "
+					"unreturned buffer\n",
+					proc->pid, thread->pid, data_ptr);
 				break;
 			}
 			binder_debug(BINDER_DEBUG_FREE_BUFFER,
