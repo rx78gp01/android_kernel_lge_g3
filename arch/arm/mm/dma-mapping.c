@@ -1016,11 +1016,11 @@ static struct page **__iommu_alloc_buffer(struct device *dev, size_t size, gfp_t
 		int j, order = __fls(count);
 
 		pages[i] = alloc_pages(order ? gfp | __GFP_NORETRY :
-						gfp | __GFP_NOWARN, order);
+						gfp, order);
 		while (!pages[i] && order) {
 			order--;
 			pages[i] = alloc_pages(order ? gfp | __GFP_NORETRY :
-							gfp | __GFP_NOWARN, order);
+							gfp, order);
 		}
 		if (!pages[i])
 			goto error;
