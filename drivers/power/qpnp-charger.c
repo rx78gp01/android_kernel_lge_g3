@@ -1565,7 +1565,7 @@ qpnp_chg_vbatdet_lo_irq_handler(int irq, void *_chip)
 #ifdef CONFIG_LGE_PM
 		chip->Is_first_chg_en = true;
 #endif
-		schedule_delayed_work(&chip->eoc_work,
+		queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 			msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 		pm_stay_awake(chip->dev);
 	}
@@ -1620,7 +1620,7 @@ qpnp_chg_usb_chg_gone_irq_handler(int irq, void *_chip)
 		qpnp_chg_charge_en(chip, 0);
 
 		qpnp_chg_force_run_on_batt(chip, 1);
-		schedule_delayed_work(&chip->arb_stop_work,
+		queue_delayed_work(system_power_efficient_wq,&chip->arb_stop_work,
 			msecs_to_jiffies(ARB_STOP_WORK_MS));
 	}
 
@@ -1861,7 +1861,7 @@ qpnp_chg_coarse_det_usb_irq_handler(int irq, void *_chip)
 				return rc;
 			}
 			ovp_ctl = ovp_ctl & USB_VALID_DEBOUNCE_TIME_MASK;
-			schedule_delayed_work(&chip->usbin_health_check,
+			queue_delayed_work(system_power_efficient_wq,&chip->usbin_health_check,
 					msecs_to_jiffies(debounce[ovp_ctl]));
 		} else {
 			/* usb coarse-det rising edge, set the usb psy health
@@ -1917,7 +1917,7 @@ qpnp_chg_usb_usbin_valid_irq_handler(int irq, void *_chip)
 
 	pr_info("usbin-valid triggered: %d\n", qpnp_chg_is_usb_chg_plugged_in(chip));
 
-	schedule_delayed_work(&chip->usb_valid_work, msecs_to_jiffies(200));
+	queue_delayed_work(system_power_efficient_wq,&chip->usb_valid_work, msecs_to_jiffies(200));
 	return IRQ_HANDLED;
 }
 
@@ -1938,11 +1938,11 @@ qpnp_chg_usb_usbin_valid_irq_handler(int irq, void *_chip)
 
 #ifdef CONFIG_LGE_CHARGER_TEMP_SCENARIO
 	cancel_delayed_work_sync(&chip->battemp_work);
-	schedule_delayed_work(&chip->battemp_work, HZ*3);
+	queue_delayed_work(system_power_efficient_wq,&chip->battemp_work, HZ*3);
 #endif
 #ifdef CONFIG_LGE_QC_2_0_SCENARIO
 	cancel_delayed_work_sync(&chip->qc20_iusb_work);
-	schedule_delayed_work(&chip->qc20_iusb_work, msecs_to_jiffies(5000));
+	queue_delayed_work(system_power_efficient_wq,&chip->qc20_iusb_work, msecs_to_jiffies(5000));
 #endif
 
 	usb_present = qpnp_chg_is_usb_chg_plugged_in(chip);
@@ -1984,7 +1984,7 @@ qpnp_chg_usb_usbin_valid_irq_handler(int irq, void *_chip)
 			}
 #ifdef CONFIG_LGE_PM
 			if (chip->chg_done) {
-				schedule_delayed_work(&chip->eoc_work,
+				queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 					msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 			}
 #endif
@@ -2033,7 +2033,7 @@ qpnp_chg_usb_usbin_valid_irq_handler(int irq, void *_chip)
 #ifdef CONFIG_LGE_PM
 			chip->Is_first_chg_en = true;
 #endif
-			schedule_delayed_work(&chip->eoc_work,
+			queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 				msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 			schedule_work(&chip->soc_check_work);
 		}
@@ -2217,7 +2217,7 @@ qpnp_chg_dc_dcin_valid_irq_handler(int irq, void *_chip)
 					qpnp_chg_is_otg_en_set(chip))) {
 			chip->chg_done = false;
 		} else {
-			schedule_delayed_work(&chip->eoc_work,
+			queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 				msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 			schedule_work(&chip->soc_check_work);
 		}
@@ -2385,7 +2385,7 @@ qpnp_chg_chgr_chg_fastchg_irq_handler(int irq, void *_chip)
 			}
 
 			if (!chip->charging_disabled) {
-				schedule_delayed_work(&chip->eoc_work,
+				queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 					msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 				pm_stay_awake(chip->dev);
 			}
@@ -3905,7 +3905,7 @@ qpnp_chg_regulator_boost_disable(struct regulator_dev *rdev)
 
 	chip->boost_disable = true;
 	cancel_delayed_work_sync(&chip->boost_disable_work);
-	schedule_delayed_work(&chip->boost_disable_work, msecs_to_jiffies(2000));
+	queue_delayed_work(system_power_efficient_wq,&chip->boost_disable_work, msecs_to_jiffies(2000));
 	return 0;
 }
 
@@ -4420,7 +4420,7 @@ qpnp_eoc_work(struct work_struct *work)
 	}
 
 check_again_later:
-	schedule_delayed_work(&chip->eoc_work,
+	queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 		msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 	return;
 
@@ -5279,7 +5279,7 @@ qpnp_set_thermal_chg_current(const char *val, struct kernel_param *kp)
 	qpnp_chg->chg_current_te = qpnp_thermal_mitigation;
 
 	cancel_delayed_work_sync(&qpnp_chg->battemp_work);
-	schedule_delayed_work(&qpnp_chg->battemp_work, HZ*1);
+	queue_delayed_work(system_power_efficient_wq,&qpnp_chg->battemp_work, HZ*1);
 #else
 	pr_err("thermal-engine chg current control not enabled\n");
 #endif
@@ -5360,18 +5360,18 @@ static void qpnp_qc20_check_work(struct work_struct *work)
 				chip->max_bat_chg_current = chip->max_bat_dcp_chg_current;
 
 				cancel_delayed_work_sync(&chip->battemp_work);
-				schedule_delayed_work(&chip->battemp_work, HZ*1);
+				queue_delayed_work(system_power_efficient_wq,&chip->battemp_work, HZ*1);
 				cancel_delayed_work_sync(&chip->qc20_iusb_work);
-				schedule_delayed_work(&chip->qc20_iusb_work, HZ*1);
+				queue_delayed_work(system_power_efficient_wq,&chip->qc20_iusb_work, HZ*1);
 
 			} else {
 				pr_info("Quick charging enabled \n");
 				chip->max_bat_chg_current = chip->max_bat_qc20_chg_current;
 
 				cancel_delayed_work_sync(&chip->battemp_work);
-				schedule_delayed_work(&chip->battemp_work, msecs_to_jiffies(10000));
+				queue_delayed_work(system_power_efficient_wq,&chip->battemp_work, msecs_to_jiffies(10000));
 				cancel_delayed_work_sync(&chip->qc20_iusb_work);
-				schedule_delayed_work(&chip->qc20_iusb_work, msecs_to_jiffies(10000));
+				queue_delayed_work(system_power_efficient_wq,&chip->qc20_iusb_work, msecs_to_jiffies(10000));
 			}
 		}
 		pr_info("qpnp_qc20_check_work state = %d, qc20_disabled =%d, pre_qc20_disabled =%d,  qc20_ta_connected =%d \n"
@@ -5526,7 +5526,7 @@ qpnp_set_quick_charging_mitigation(const char *val, struct kernel_param *kp)
 	qpnp_chg->chg_current_qc20_te = quick_charging_mitigation;
 
 	cancel_delayed_work_sync(&qpnp_chg->battemp_work);
-	schedule_delayed_work(&qpnp_chg->battemp_work, HZ*1);
+	queue_delayed_work(system_power_efficient_wq,&qpnp_chg->battemp_work, HZ*1);
 
 	return 0;
 }
@@ -5605,7 +5605,7 @@ static ssize_t at_chg_status_store(struct device *dev,
 		return -EINVAL;
 
 	cancel_delayed_work_sync(&qpnp_chg->eoc_work);
-	schedule_delayed_work(&qpnp_chg->eoc_work, msecs_to_jiffies(0));
+	queue_delayed_work(system_power_efficient_wq,&qpnp_chg->eoc_work, msecs_to_jiffies(0));
 
 	return 1;
 }
@@ -5671,7 +5671,7 @@ static ssize_t at_chg_complete_store(struct device *dev,
 		return -EINVAL;
 
 	cancel_delayed_work_sync(&qpnp_chg->eoc_work);
-	schedule_delayed_work(&qpnp_chg->eoc_work, msecs_to_jiffies(0));
+	queue_delayed_work(system_power_efficient_wq,&qpnp_chg->eoc_work, msecs_to_jiffies(0));
 
 	return 1;
 }
@@ -5729,7 +5729,7 @@ static ssize_t set_max_current(struct device *dev,
 	if (data >= QPNP_CHG_IBATMAX_MIN && data  <= QPNP_CHG_IBATMAX_MAX) {
 		qpnp_chg->max_bat_chg_current = data;
 		cancel_delayed_work_sync(&qpnp_chg->battemp_work);
-		schedule_delayed_work(&qpnp_chg->battemp_work, HZ*1);
+		queue_delayed_work(system_power_efficient_wq,&qpnp_chg->battemp_work, HZ*1);
 	}
 
 	return 1;
@@ -5773,7 +5773,7 @@ static ssize_t set_max_current_dcp(struct device *dev,
 			qpnp_chg->max_bat_chg_current = qpnp_chg->max_bat_dcp_chg_current;
 
 		cancel_delayed_work_sync(&qpnp_chg->battemp_work);
-		schedule_delayed_work(&qpnp_chg->battemp_work, HZ*1);
+		queue_delayed_work(system_power_efficient_wq,&qpnp_chg->battemp_work, HZ*1);
 	}
 	return 1;
 }
@@ -5817,7 +5817,7 @@ static ssize_t set_max_current_qc20(struct device *dev,
 			qpnp_chg->max_bat_chg_current = qpnp_chg->max_bat_qc20_chg_current;
 
 		cancel_delayed_work_sync(&qpnp_chg->battemp_work);
-		schedule_delayed_work(&qpnp_chg->battemp_work, HZ*1);
+		queue_delayed_work(system_power_efficient_wq,&qpnp_chg->battemp_work, HZ*1);
 	}
 
 	return 1;
@@ -6487,7 +6487,7 @@ static void qpnp_monitor_batt_temp(struct work_struct *work)
 			qpnp_chg_ibatmax_set(chip, res.dc_current);
 			if (res.change_lvl == STS_CHE_STPCHG_TO_DECCUR) {
 				qpnp_chg_charge_pause(chip, res.disable_chg);
-				schedule_delayed_work(&chip->eoc_work,
+				queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 					msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 #ifdef CONFIG_MACH_MSM8974_G3_KDDI
 				wake_lock_timeout(&chip->lcs_wake_lock, HZ*11);
@@ -6515,7 +6515,7 @@ static void qpnp_monitor_batt_temp(struct work_struct *work)
 			qpnp_chg_ibatmax_set(chip, res.dc_current);
 #endif
 			qpnp_chg_charge_pause(chip, res.disable_chg);
-			schedule_delayed_work(&chip->eoc_work,
+			queue_delayed_work(system_power_efficient_wq,&chip->eoc_work,
 				msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 #ifdef CONFIG_MACH_MSM8974_G3_KDDI
 			wake_lock_timeout(&chip->lcs_wake_lock, HZ*11);
@@ -6538,7 +6538,7 @@ static void qpnp_monitor_batt_temp(struct work_struct *work)
 	chip->btm_state = res.btm_state;
 	power_supply_changed(&chip->batt_psy);
 
-	schedule_delayed_work(&chip->battemp_work,
+	queue_delayed_work(system_power_efficient_wq,&chip->battemp_work,
 		MONITOR_BATTEMP_POLLING_PERIOD);
 }
 #endif
@@ -7067,7 +7067,7 @@ qpnp_charger_probe(struct spmi_device *spmi)
 		qpnp_qc20_set_qc_state(QC20_STATUS_LCD_ON);
 #endif
 
-	schedule_delayed_work(&chip->aicl_check_work,
+	queue_delayed_work(system_power_efficient_wq,&chip->aicl_check_work,
 		msecs_to_jiffies(EOC_CHECK_PERIOD_MS));
 	pr_info("success chg_dis = %d, bpd = %d, usb = %d, dc = %d b_health = %d batt_present = %d\n",
 			chip->charging_disabled,
@@ -7169,7 +7169,7 @@ static int qpnp_chg_resume(struct device *dev)
 	}
 #endif
 #ifdef CONFIG_LGE_CHARGER_TEMP_SCENARIO
-	schedule_delayed_work(&chip->battemp_work, HZ*10);
+	queue_delayed_work(system_power_efficient_wq,&chip->battemp_work, HZ*10);
 #endif
 
 	return rc;
